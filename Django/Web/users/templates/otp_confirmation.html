@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác nhận OTP</title>
+  </head>
+  <body>
+    <h1>Xác nhận OTP</h1>
+    <form method="post" action="{% url 'confirm_otp' %}">
+      {% csrf_token %}
+      <label for="otp">Nhập mã OTP:</label><br />
+      <input type="text" id="otp" name="otp" /><br />
+      <input type="submit" value="Xác nhận" />
+    </form>
+  </body>
+</html>

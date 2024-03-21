@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navigation Bar Example</title>
+    <!-- Bootstrap CSS -->
+    {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+  </head>
+  <body>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" href="#">Rinyal</a>
+        <!-- Toggler/collapsible Button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            {% if request.session.username %}
+            <li class="nav-item">
+              <a class="nav-link" href="user">{{ request.session.username }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="logout">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cart">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="discount">Discount</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="login">Login</a>
+            </li>
+            {% endif %} {% if request.session.role == 'admin' %}
+            <li class="nav-item">
+              <a class="nav-link" href="admin">Admin</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <section class="container">
+      <div>
+        <h1>Loại sản phẩm</h1>
+        {% for kind in kinds %}
+        <a href="{{ kind.id }}">{{ kind.name }}</a>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for product in products %}
+        <div class="col-md-3" style="height=300px">
+          <!-- Chỉnh sửa kích thước cột để hiển thị 4 sản phẩm trong mỗi hàng -->
+          <div class="card" style="width: 18rem">
+            <img
+              src="{% static '/dist/img/products/' %}{{ product.image_name }}"
+              class="card-img-top"
+              alt="{{ product.name }}"
+              style="height: 200px"
+            />
+            <div class="card-body">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text">{{ product.description }}</p>
+              <a href="#" class="btn btn-primary">Buy</a>
+              <a href="add_cart/{{ product.id }}" class="btn btn-primary"
+                >Add to Cart</a
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </body>
+</html>

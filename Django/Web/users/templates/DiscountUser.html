@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navigation Bar Example</title>
+    <!-- Bootstrap CSS -->
+    {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+  </head>
+  <body>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" href="#">Rinyal</a>
+        <!-- Toggler/collapsible Button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            {% if request.session.username %}
+            <li class="nav-item">
+              <a class="nav-link" href="user">{{ request.session.username }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="logout">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cart">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="discount">Discount</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="login">Login</a>
+            </li>
+            {% endif %} {% if request.session.role == 'admin' %}
+            <li class="nav-item">
+              <a class="nav-link" href="admin">Admin</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <style>
+      /* Custom CSS for the discount page */
+      .discount-container {
+        padding: 20px;
+      }
+      .discount-card {
+        margin-bottom: 20px;
+      }
+      .discount-image {
+        height: 200px;
+        object-fit: cover;
+      }
+      .discount-details {
+        padding: 20px;
+      }
+      .discount-details label {
+        font-weight: bold;
+      }
+    </style>
+    <section class="discount-container">
+      <div>
+        <h1 class="text-center">Mã đã lưu</h1>
+      </div>
+      <div class="container">
+      <div class="row">
+        {% for discount in discount_save %}
+        <div class="col-lg-4">
+          <div class="card discount-card">
+            <div class="card-body discount-details">
+              <h5 class="card-title">{{ discount.discount.name }}</h5>
+              <div class="details">
+                <p class="card-text">
+                  <label for="">Điều kiện:</label> {{ discount.discount.condition }}
+                </p>
+              </div>
+              <div class="details">
+                <p class="card-text">
+                  <label for="">Thời gian bắt đầu:</label>
+                  {{ discount.discount.start_date|date:"d/m/Y H:i:s" }}
+                </p>
+              </div>
+              <div class="details">
+                <p class="card-text">
+                  <label for="">Thời gian kết thúc:</label>
+
+                  {{ discount.discount.end_date|date:"d/m/Y H:i:s" }}
+                </p>
+              </div>
+              <div class="details">
+                <p class="card-text">
+                  <label for="">Giảm giá:</label> {{ discount.discount.money }}
+                </p>
+              </div>
+              <div class="details">
+                <p class="card-text">
+                  <label for="">Số lượng:</label> {{ discount.discount.quantity }}
+                </p>
+              </div>
+              <br />
+              {% comment %} Thẻ a dùng mã {% endcomment %}
+              <a href="{{ discount.discount.kind.id }}" class="btn btn-primary"
+                >Dùng ngay</a
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <h1 class="text-center">Danh sách mã giảm giá</h1>
+      </div>
+      <div class="container">
+        <div class="row">
+          {% for discount in discounts %}
+          <div class="col-lg-4">
+            <div class="card discount-card">
+              <div class="card-body discount-details">
+                <h5 class="card-title">{{ discount.name }}</h5>
+                <div class="details">
+                  <p class="card-text">
+                    <label for="">Điều kiện:</label> {{ discount.condition }}
+                  </p>
+                </div>
+                <div class="details">
+                  <p class="card-text">
+                    <label for="">Thời gian bắt đầu:</label>
+                    {{ discount.start_date|date:"d/m/Y H:i:s" }}
+                  </p>
+                </div>
+                <div class="details">
+                  <p class="card-text">
+                    <label for="">Thời gian kết thúc:</label>
+
+                    {{ discount.end_date|date:"d/m/Y H:i:s" }}
+                  </p>
+                </div>
+                <div class="details">
+                  <p class="card-text">
+                    <label for="">Giảm giá:</label> {{ discount.money }}
+                  </p>
+                </div>
+                <div class="details">
+                  <p class="card-text">
+                    <label for="">Số lượng:</label> {{ discount.quantity }}
+                  </p>
+                </div>
+                <br />
+                {% comment %} Kiểm tra xem mã có được lưu hay chưa {% endcomment %}
+                {% if discount.id not in discount_save_id %}
+                <a href="save_discount/{{ discount.id }}" class="btn btn-primary"
+                  >Lưu mã</a>
+                {% else %}
+                <p class="text-success">Đã lưu</p>
+                  {% endif %}
+              </div>
+              
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

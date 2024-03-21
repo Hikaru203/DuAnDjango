@@ -1,0 +1,50 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng Nhập</title>
+    {% bootstrap_css %}
+  </head>
+  <body>
+    <div class="container">
+      <h2>Đăng Nhập</h2>
+      <form action="./loginpost" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Tên người dùng:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Mật khẩu:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="window.location.href = '/register'"
+          >
+            Đăng Ký
+          </button>
+          <input type="submit" class="btn btn-success" value="Đăng Nhập" />
+        </div>
+      </form>
+    </div>
+    {% bootstrap_javascript %}
+  </body>
+</html>

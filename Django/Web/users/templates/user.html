@@ -1,0 +1,65 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cập Nhật Thông Tin Tài Khoản</title>
+    {% bootstrap_css %}
+  </head>
+  <body>
+    <div class="container">
+      <h2>Cập Nhật Thông Tin Tài Khoản</h2>
+      <form action="./update_user" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Tên người dùng:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            value="{{ user.username }}"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email:</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            value="{{ user.email }}"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Số điện thoại:</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="phone"
+            name="phone"
+            value="{{ user.phone }}"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Mật khẩu mới:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+          />
+        </div>
+        <div class="mb-3">
+          <input type="submit" class="btn btn-success" value="Cập Nhật" />
+        </div>
+      </form>
+    </div>
+    {% bootstrap_javascript %}
+  </body>
+</html>

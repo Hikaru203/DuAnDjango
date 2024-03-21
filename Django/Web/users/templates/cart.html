@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navigation Bar Example</title>
+    <!-- Bootstrap CSS -->
+    {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+    <style>
+      .cart-item {
+        display: flex;
+        border-bottom: 1px solid #e5e5e5;
+        padding: 20px 0;
+      }
+
+      .product-image img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 20px;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-title {
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
+
+      .product-description {
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .product-price {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .product-actions .btn {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" href="./">Rinyal</a>
+        <!-- Toggler/collapsible Button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            {% if request.session.username %}
+            <li class="nav-item">
+              <a class="nav-link" href="user">{{ request.session.username }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="logout">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cart">Cart</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="login">Login</a>
+            </li>
+            {% endif %} {% if request.session.role == 'admin' %}
+            <li class="nav-item">
+              <a class="nav-link" href="admin">Admin</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <section class="container">
+      <div class="row">
+        {% if carts %}
+        <div class="col-12">
+          <!-- Checkbox to select all products -->
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="select-all-checkbox"
+              name="product"
+              value="all"
+            />
+            <label class="form-check-label" for="select-all-checkbox">
+              Select all
+            </label>
+          </div>
+        </div>
+        {% endif %} {% for cart in carts %}
+        <!-- Loop through each cart item -->
+        <div>
+          <!-- Checkbox for each product -->
+          <div class="form-check" id="form-check">
+            <input
+              class="form-check-input product-checkbox"
+              type="checkbox"
+              name="product"
+              value="{{ cart.id }}"
+              style="margin-top: 20px"
+            />
+            <!-- Product information -->
+            <div class="cart-item">
+              <div class="product-image">
+                <img
+                  src="{% static '/dist/img/products/' %}{{ cart.product.image_name }}"
+                />
+              </div>
+              <div class="product-details">
+                <h5 class="product-title">{{ cart.product.name }}</h5>
+                <p class="product-description">
+                  {{ cart.product.description }}
+                </p>
+                <p class="product-price">{{ cart.product.price }}</p>
+                <p class="product-quantity">Quantity: {{ cart.quantity }}</p>
+                <input type="hidden" id="quantity"  name="quantity" value="{{ cart.quantity }}">
+                <input type="hidden" id="product_id" name="product_id" value="{{ cart.product.id }}">
+                <div class="product-actions">
+                  <a
+                    href="plus_cart/{{ cart.id }}?quantity=1"
+                    class="btn btn-sm btn-primary"
+                    >+</a
+                  >
+                  <a
+                    href="except_cart/{{ cart.id }}?quantity=1"
+                    class="btn btn-sm btn-danger"
+                    >-</a>
+                  <a
+                    href="remove_cart/{{ cart.id }}?quantity=0"
+                    class="btn btn-sm btn-warning"
+                    >Remove</a
+                  >
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        <!-- Display total price if there are items in the cart -->
+        {% if carts %}
+        <div class="cart-item">
+          <div class="product-details">
+            <p class="total-price">0</p>
+            <form action="checkout" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="total_price" class="total-price" id="total_price" >
+              <input type="hidden" name="selected_products" id="selected_products" value="">
+              <button type="submit" class="btn btn-primary">Buy</button>
+            </form>
+          </div>
+        </div>
+        <!-- Display message if the cart is empty -->
+        {% else %}
+        <div class="cart-item">
+          <div class="product-details">
+            <h5 class="product-title">Cart is empty</h5>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      
+
+      <script>
+        document
+          .getElementById("select-all-checkbox")
+          .addEventListener("change", function () {
+            var checkboxes = document.querySelectorAll(".product-checkbox");
+            for (var checkbox of checkboxes) {
+              checkbox.checked = this.checked;
+            }
+            calculateTotalPrice();
+          });
+
+        var checkboxes = document.querySelectorAll(".product-checkbox");
+        for (var checkbox of checkboxes) {
+          checkbox.addEventListener("change", calculateTotalPrice);
+        }
+        var buy = document.getElementById("buy");
+        function calculateTotalPrice() {
+          var totalPrice = 0;
+          var selectedProducts = [];
+      
+          var checkboxes = document.querySelectorAll(".product-checkbox:checked");
+          for (var checkbox of checkboxes) {
+              var price = parseFloat(
+                  checkbox.parentNode.querySelector(".product-price").textContent
+              );
+              totalPrice +=
+                  price *
+                  checkbox.parentNode
+                  .querySelector(".product-quantity")
+                  .textContent.split(":")[1];
+      
+              var product_id = checkbox.parentNode.querySelector("#product_id").value;
+              var quantity = checkbox.parentNode.querySelector("#quantity").value;
+              selectedProducts.push(product_id + ":" + quantity);
+          }
+      
+          // Update total price
+          document.querySelector(".total-price").textContent = totalPrice.toFixed(2);
+          document.getElementById("total_price").value = totalPrice;
+      
+          // Update selected products
+          document.getElementById("selected_products").value = selectedProducts.join(",");
+      
+          // Check if any checkboxes are unchecked
+          var uncheckedCheckboxes = document.querySelectorAll(".product-checkbox:not(:checked)");
+          for (var uncheckedCheckbox of uncheckedCheckboxes) {
+              var product_id = uncheckedCheckbox.parentNode.querySelector("#product_id").value;
+              var quantity = uncheckedCheckbox.parentNode.querySelector("#quantity").value;
+              var productToRemove = product_id + ":" + quantity + ",";
+              var productsIndex = selectedProducts.indexOf(productToRemove);
+              if (productsIndex !== -1) {
+                  selectedProducts.splice(productsIndex, 1);
+              }
+          }
+      }
+      
+      </script>
+    </section>
+  </body>
+</html>
